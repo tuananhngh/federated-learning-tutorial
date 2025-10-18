@@ -13,3 +13,8 @@ build/
 # macOS
 .DS_Store
 ._*
+
+# Data
+data/
+partition_dir/
+test_script/
