@@ -5,6 +5,17 @@ from datasets import load_dataset
 from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import IidPartitioner
 from torch.utils.data import DataLoader
+from torchvision.transforms import Compose, ToTensor, Normalize
+
+fds = None  # Cache FederatedDataset
+
+pytorch_transforms = Compose([ToTensor(), Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+
+def apply_transforms(batch):
+    """Apply transforms to the partition from FederatedDataset."""
+    batch["img"] = [pytorch_transforms(img) for img in batch["img"]]
+    return batch
 
 
 # Basic CNN Model
