@@ -1,6 +1,6 @@
 # Frugal AI - Federated Learning Tutorial
 
-This repository contains a comprehensive step-by-step tutorial on Federated Learning using the Flower framework and PyTorch. It serves as an educational resource for the Frugal AI class at MIAI Grenoble.
+This repository contains a comprehensive step-by-step tutorial on Federated Learning using the Flower framework and PyTorch. It serves as an educational resource for the Frugal AI class at MIAI Grenoble. The tutorial is built upon the Flower Examples.
 
 ## 📚 What is Federated Learning?
 
@@ -43,32 +43,22 @@ This tutorial consists of 5 interactive Jupyter notebooks that guide you through
 
 4. **Navigate to the `notebooks/` folder and start with notebook 01**
 
-### Option 2: Local Installation
+### Option 2: Without Docker
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd frugal-ai-example
-   ```
+```bash
+# 1. Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-2. **Create a virtual environment**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+# 2. Install dependencies
+pip install -e .
+pip install jupyter jupyterlab
 
-3. **Install dependencies**:
-   ```bash
-   pip install -e .
-   pip install jupyter jupyterlab
-   ```
+# 3. Start Jupyter
+jupyter lab
 
-4. **Start Jupyter Lab**:
-   ```bash
-   jupyter lab
-   ```
-
-5. **Navigate to the `notebooks/` folder**
+# 4. Open notebooks/01_introduction_to_federated_learning.ipynb
+```
 
 ## 📖 Tutorial Structure
 
@@ -156,23 +146,6 @@ Output (10 classes)
 - NumPy, Matplotlib
 - Docker (optional, but recommended)
 
-## 📝 Exercises
-
-Each notebook contains exercises for students to:
-- Understand core concepts
-- Experiment with different configurations
-- Implement variations and extensions
-- Analyze results and trade-offs
-
-## 🎓 Learning Outcomes
-
-By completing this tutorial, students will:
-1. ✅ Understand federated learning principles
-2. ✅ Implement FL clients and servers using Flower
-3. ✅ Work with distributed datasets
-4. ✅ Analyze privacy-utility trade-offs
-5. ✅ Compare federated vs centralized learning
-6. ✅ Understand communication costs in FL
 
 ## 🔗 Additional Resources
 
@@ -181,10 +154,6 @@ By completing this tutorial, students will:
 - [Flower Examples](https://github.com/adap/flower/tree/main/examples)
 - [PyTorch Tutorials](https://pytorch.org/tutorials/)
 
-### Research Papers
-- [Communication-Efficient Learning of Deep Networks from Decentralized Data](https://arxiv.org/abs/1602.05629) (FedAvg)
-- [Federated Optimization in Heterogeneous Networks](https://arxiv.org/abs/1812.06127) (FedProx)
-- [Advances and Open Problems in Federated Learning](https://arxiv.org/abs/1912.04977)
 
 ## 🤝 Contributing
 
@@ -195,7 +164,7 @@ This is an educational project for the Frugal AI class. Students are encouraged 
 
 ## 📧 Contact
 
-For questions about this tutorial, please contact the course instructors or open an issue.
+For questions about this tutorial, please contact the course instructors/
 
 ## 📄 License
 
@@ -203,5 +172,4 @@ This project is for educational purposes as part of the MIAI Grenoble Frugal AI 
 
 ---
 
-**Happy Learning! 🚀**
 
