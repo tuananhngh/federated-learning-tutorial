@@ -14,6 +14,8 @@ dependencies = [
   "numpy",
   "matplotlib",
   "flwr",
+  "flwr-datasets[vision]",
+  "datasets",
 ]
 
 [tool.setuptools]
@@ -22,3 +24,24 @@ package-dir = { "" = "src" }
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["fltutorial*"]
+
+# Flower configuration for federated learning
+[tool.flwr.app]
+publisher = "frugal-ai"
+
+[tool.flwr.app.components]
+serverapp = "fltutorial.server:app"
+clientapp = "fltutorial.client:app"
+
+[tool.flwr.app.config]
+num-server-rounds = 2
+learning-rate = 0.01
+local-epochs = 3
+batch-size = 32
+fraction-evaluate = 1.0
+
+[tool.flwr.federations]
+default = "local-simulation"
+
+[tool.flwr.federations.local-simulation]
+options.num-supernodes = 3

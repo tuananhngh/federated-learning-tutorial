@@ -1,5 +1,8 @@
 import torch
+import json
+import os
 from collections import OrderedDict
+from pathlib import Path
 from flwr.app import (
     ArrayRecord,
     ConfigRecord,
@@ -16,6 +19,10 @@ from fltutorial.task import train as train_fn
 
 app = ClientApp()
 
+# Create directory for metrics
+METRICS_DIR = Path("metrics")
+METRICS_DIR.mkdir(exist_ok=True)
+
 
 @app.train()
 def train(msg: Message, context: Context) -> Message:
@@ -23,9 +30,9 @@ def train(msg: Message, context: Context) -> Message:
 
     # Load the model and initialize it with the received weights
     assert isinstance(msg.content["arrays"], ArrayRecord)
-    assert isinstance(msg.content["config"], ConfigRecord)
-    assert isinstance(msg.content["metrics"], MetricRecord)
 
+    if "config" in msg.content:
+        assert isinstance(msg.content["config"], ConfigRecord)
     model = Net()
     model.load_state_dict(msg.content["arrays"].to_torch_state_dict())
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -40,7 +47,10 @@ def train(msg: Message, context: Context) -> Message:
         and isinstance(num_partitions, int)
         and isinstance(batch_size, int)
     ):
+        print(f"Loading data for partition {partition_id}/{num_partitions}")
+        print(f"Batch size: {batch_size}")
         trainloader, _ = load_data(partition_id, num_partitions, batch_size)
+        print(f"Loaded {len(trainloader.dataset)} training samples")
     else:
         raise ValueError(
             "partition_id, num_partitions, and batch_size must be integers"
@@ -54,6 +64,24 @@ def train(msg: Message, context: Context) -> Message:
         msg.content["config"]["lr"],
         device,
     )
+
+    # Log metrics for this client
+    partition_id = context.node_config["partition-id"]
+    server_round = context.state.current_round()
+
+    # Save training metrics
+    metrics_file = METRICS_DIR / f"client_{partition_id}_metrics.json"
+    if metrics_file.exists():
+        with open(metrics_file, "r") as f:
+            client_metrics = json.load(f)
+    else:
+        client_metrics = {"train_loss": [], "eval_loss": [], "eval_acc": [], "rounds": []}
+
+    client_metrics["train_loss"].append(train_loss)
+    client_metrics["rounds"].append(server_round)
+
+    with open(metrics_file, "w") as f:
+        json.dump(client_metrics, f, indent=2)
 
     # Construct and return reply Message
     model_record = ArrayRecord(model.state_dict())  # type: ignore
@@ -72,8 +100,7 @@ def evaluate(msg: Message, context: Context):
 
     # Load the model and initialize it with the received weights
     assert isinstance(msg.content["arrays"], ArrayRecord)
-    assert isinstance(msg.content["config"], ConfigRecord)
-    assert isinstance(msg.content["metrics"], MetricRecord)
+    # Config and metrics may not always be present in evaluation messages
 
     model = Net()
     model.load_state_dict(msg.content["arrays"].to_torch_state_dict())
@@ -101,6 +128,24 @@ def evaluate(msg: Message, context: Context):
         valloader,
         device,
     )
+
+    # Log evaluation metrics for this client
+    partition_id = context.node_config["partition-id"]
+    server_round = context.state.current_round()
+
+    # Save evaluation metrics
+    metrics_file = METRICS_DIR / f"client_{partition_id}_metrics.json"
+    if metrics_file.exists():
+        with open(metrics_file, "r") as f:
+            client_metrics = json.load(f)
+    else:
+        client_metrics = {"train_loss": [], "eval_loss": [], "eval_acc": [], "rounds": []}
+
+    client_metrics["eval_loss"].append(eval_loss)
+    client_metrics["eval_acc"].append(eval_acc)
+
+    with open(metrics_file, "w") as f:
+        json.dump(client_metrics, f, indent=2)
 
     # Construct and return reply Message
     metrics = {

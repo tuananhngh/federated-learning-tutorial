@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.git
+.gitignore
+.mypy_cache
+.ruff_cache
+*.pt
+final_model.pt
+data/
+partition_dir/
+.DS_Store
